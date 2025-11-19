@@ -6,16 +6,31 @@ import App from './App';
 const resizeObserverLoopErr = /ResizeObserver loop limit exceeded/;
 const resizeObserverUndeliveredErr = /ResizeObserver loop completed with undelivered notifications/;
 
+// Suppress console.error
 const originalError = console.error;
 console.error = (...args) => {
-  if (typeof args[0] === 'string') {
-    if (resizeObserverLoopErr.test(args[0]) || resizeObserverUndeliveredErr.test(args[0])) {
-      return;
-    }
+  if (args.some(arg => 
+    typeof arg === 'string' && (resizeObserverLoopErr.test(arg) || resizeObserverUndeliveredErr.test(arg))
+  )) {
+    return;
   }
   originalError.call(console, ...args);
 };
 
+// Suppress window.onerror
+const originalOnerror = window.onerror;
+window.onerror = (msg, source, lineno, colno, error) => {
+    const strMsg = String(msg);
+    if (resizeObserverLoopErr.test(strMsg) || resizeObserverUndeliveredErr.test(strMsg)) {
+        return true; // Suppress
+    }
+    if (originalOnerror) {
+        return originalOnerror(msg, source, lineno, colno, error);
+    }
+    return false;
+}
+
+// Suppress window 'error' event
 window.addEventListener('error', (e) => {
   const msg = e.message;
   if (
