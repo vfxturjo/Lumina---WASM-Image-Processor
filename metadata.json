@@ -1,0 +1,7 @@
+{
+  "name": "Lumina - WASM Visual Processor",
+  "description": "A high-performance, client-side visual node graph engine for image processing using a hybrid JS/WASM architecture pattern.",
+  "requestFramePermissions": [
+    "clipboard-read"
+  ]
+}
